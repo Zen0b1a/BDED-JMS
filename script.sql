@@ -1,0 +1,6 @@
+CREATE TABLE action (id INTEGER PRIMARY KEY, nom_action VARCHAR2(50));
+INSERT INTO action VALUES(1, 'action_1');
+INSERT INTO action VALUES(2, 'action_2');
+
+CREATE TABLE action_1 (id INTEGER PRIMARY KEY, cours NUMBER(6,2));
+CREATE TABLE action_2 (id INTEGER PRIMARY KEY, cours NUMBER(6,2));
