@@ -12,6 +12,7 @@ import org.objectweb.joram.client.jms.admin.User;
 import org.objectweb.joram.client.jms.tcp.TcpConnectionFactory;
 
 import java.net.InetAddress;
+import java.net.NetworkInterface;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -31,7 +32,6 @@ import javax.jms.QueueConnectionFactory;
 import javax.jms.TopicConnectionFactory;
 
 import oracle.jdbc.OracleConnection;
-import oracle.jdbc.OracleDriver;
 import oracle.jdbc.OracleStatement;
 
 import oracle.jdbc.dcn.DatabaseChangeEvent;
@@ -80,10 +80,55 @@ public class DiffuseActions
 		rs.close();
 		stmt.close();
 		
+		//Définition de l'adresse ip à utiliser (pour le listner)
+		//Récupération des adresses
+		Enumeration nifs = NetworkInterface.getNetworkInterfaces();
+		List<String> ip_disponibles = new ArrayList();
+		String ip = InetAddress.getLocalHost().getHostAddress();
+		while (nifs.hasMoreElements()) 
+		{
+			NetworkInterface ni = (NetworkInterface)nifs.nextElement();
+			if(ni.isUp() && !ni.isLoopback())
+			{
+				Enumeration ia = ni.getInetAddresses();
+				while(ia.hasMoreElements())
+				{
+					InetAddress a = (InetAddress)ia.nextElement();
+					if(!a.isLinkLocalAddress())
+						ip_disponibles.add(a.getHostAddress());
+				}
+			}
+		}
+		if(ip_disponibles.size()>1)
+		{
+			String choix_ip = "";
+			Scanner sc = new Scanner(System.in);
+			for(int i=0; i<ip_disponibles.size(); i++)
+				System.out.println(i+" - "+ip_disponibles.get(i));
+			//Tant que l'option est invalide on redemande
+			while(choix_ip.equals(""))
+			{
+				System.out.println("Choisir le numéro de l'adresse ip de la machine :");
+				choix_ip = sc.nextLine();
+				try
+				{
+					if(Integer.parseInt(choix_ip)<0 || Integer.parseInt(choix_ip)>=ip_disponibles.size())
+						choix_ip = "";
+					else
+						choix_ip = ip_disponibles.get(Integer.parseInt(choix_ip));
+				}
+				catch(NumberFormatException ex)
+				{
+					choix_ip = "";
+				}
+			}
+			ip = choix_ip;
+		}
+		
 		//Propriétés du DatabaseChangeRegistration
 		Properties prop = new Properties();
-		prop.setProperty(OracleConnection.DCN_NOTIFY_ROWIDS,"true");
-		prop.setProperty(OracleConnection.NTF_LOCAL_HOST,"192.168.1.87"); //Pour co à travers le VPN
+		prop.setProperty(OracleConnection.DCN_NOTIFY_ROWIDS, "true");
+		prop.setProperty(OracleConnection.NTF_LOCAL_HOST, ip);
 		DatabaseChangeRegistration dcr = connexion.registerDatabaseChangeNotification(prop);
 		//Ajout du listener
 		DCNBDListener listener = new DCNBDListener();
@@ -183,30 +228,6 @@ class DCNBDListener implements DatabaseChangeListener
 		catch (Exception ex) 
 		{
 			Logger.getLogger(DCNBDListener.class.getName()).log(Level.SEVERE, null, ex);
-		}
-	}
-}
-
-class Connexion
-{
-	final private static String LOGIN = "ag092850";
-    final private static String MDP = "ag092850";
-    final private static String URL_FAC = "jdbc:oracle:thin:@butor:1521:ensb2017";
-    final private static String URL_EXTERIEUR = "jdbc:oracle:thin:@ufrsciencestech.u-bourgogne.fr:25561:ensb2017";
-	
-	public static OracleConnection connect() throws SQLException
-	{
-		OracleDriver dr = new OracleDriver();
-		Properties prop = new Properties();
-		prop.setProperty("user", Connexion.LOGIN);
-		prop.setProperty("password", Connexion.MDP);
-		try
-		{
-			return (OracleConnection)dr.connect(Connexion.URL_FAC, prop);
-		}
-		catch (SQLException ex) 
-		{
-			return (OracleConnection)dr.connect(Connexion.URL_EXTERIEUR, prop);
 		}
 	}
 }

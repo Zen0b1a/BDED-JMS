@@ -277,6 +277,7 @@
     </java>
   </target>
   
+  <!-- Début diffusion des actions -->
   <!-- Diffusion des actions -->
   <target name="diffuse_actions" depends="simple_init"
           description="--> ">
@@ -296,7 +297,60 @@
       <classpath path="${project.class.path}"/>
     </java>
   </target>
-
+  <!-- Fin diffusion des actions -->
+  
+  <!-- Début vente en ligne v1 -->
+  <!-- Administration des canaux -->
+  <target name="vel_admin" depends="simple_init"
+          description="--> ">
+    <java classname="venteEnLigneV1.VELAdmin"
+      failonerror="no" fork="yes"
+      dir="${run.dir}">
+      <classpath path="${project.class.path}"/>
+    </java>
+  </target>
+  
+  <!-- Service validation -->
+  <target name="vel_validation" depends="simple_init"
+          description="--> ">
+    <java classname="venteEnLigneV1.validation.Validation"
+      failonerror="no" fork="yes"
+      dir="${run.dir}">
+      <classpath path="${project.class.path}"/>
+    </java>
+  </target>
+  
+  <!-- Service preparation -->
+  <target name="vel_preparation" depends="simple_init"
+          description="--> ">
+    <java classname="venteEnLigneV1.preparation.Preparation"
+      failonerror="no" fork="yes"
+      dir="${run.dir}">
+      <classpath path="${project.class.path}"/>
+    </java>
+  </target>
+  
+  <!-- Service facturation -->
+  <target name="vel_facturation" depends="simple_init"
+          description="--> ">
+    <java classname="venteEnLigneV1.facturation.Facturation"
+      failonerror="no" fork="yes"
+      dir="${run.dir}">
+      <classpath path="${project.class.path}"/>
+    </java>
+  </target>
+  
+  <!-- Service expédition -->
+  <target name="vel_expedition" depends="simple_init"
+          description="--> ">
+    <java classname="venteEnLigneV1.expedition.Expedition"
+      failonerror="no" fork="yes"
+      dir="${run.dir}">
+      <classpath path="${project.class.path}"/>
+    </java>
+  </target>
+  <!-- Fin vente en ligne v1 -->
+  
   <!-- Setup the classic configuration -->
   <target name="classic_admin" depends="simple_init"
           description="--> Runs administration code for classic sample (centralized architecture)">
