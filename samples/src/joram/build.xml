@@ -210,6 +210,69 @@
     </antcall>
   </target>
 	
+	<!-- Serveurs pour vel2 -->
+	<target name="server_vel0" depends="init"
+          description="--> Démarre un serveur pour vente en ligne (id 0)">
+    <antcall target="server">
+      <param name="sid" value="0"/>
+      <param name="a3.conf" value="${conf.dir}/distributed_vel_servers.xml"/>
+      <param name="osgi.conf" value="${conf.dir}/config_min.properties"/>  
+    	<param name="monit.conf" value="${conf.dir}/MonitoringConfig_vel0.xml"/>
+    </antcall>
+  </target>
+  
+  <target name="server_vel1" depends="init"
+          description="--> Démarre un serveur pour vente en ligne (id 1)">
+    <antcall target="server">
+      <param name="sid" value="1"/>
+      <param name="a3.conf" value="${conf.dir}/distributed_vel_servers.xml"/>
+      <param name="osgi.conf" value="${conf.dir}/config_min.properties"/>  
+    	<param name="monit.conf" value="${conf.dir}/MonitoringConfig_vel1.xml"/>
+    </antcall>
+  </target>
+  
+  <target name="server_vel2" depends="init"
+          description="--> Démarre un serveur pour vente en ligne (id 2)">
+    <antcall target="server">
+      <param name="sid" value="2"/>
+      <param name="a3.conf" value="${conf.dir}/distributed_vel_servers.xml"/>
+      <param name="osgi.conf" value="${conf.dir}/config_min.properties"/>  
+    	<param name="monit.conf" value="${conf.dir}/MonitoringConfig_vel2.xml"/>
+    </antcall>
+  </target>
+  
+  <target name="server_vel3" depends="init"
+          description="--> Démarre un serveur pour vente en ligne (id 3)">
+    <antcall target="server">
+      <param name="sid" value="3"/>
+      <param name="a3.conf" value="${conf.dir}/distributed_vel_servers.xml"/>
+      <param name="osgi.conf" value="${conf.dir}/config_min.properties"/>  
+    	<param name="monit.conf" value="${conf.dir}/MonitoringConfig_vel3.xml"/>
+    </antcall>
+  </target>
+  
+  <target name="server_vel4" depends="init"
+          description="--> Démarre un serveur pour vente en ligne (id 4)">
+    <antcall target="server">
+      <param name="sid" value="4"/>
+      <param name="a3.conf" value="${conf.dir}/distributed_vel_servers.xml"/>
+      <param name="osgi.conf" value="${conf.dir}/config_min.properties"/>  
+    	<param name="monit.conf" value="${conf.dir}/MonitoringConfig_vel4.xml"/>
+    </antcall>
+  </target>
+  
+  <target name="servers_vel"
+          description="--> Démarre les serveurs de vente en ligne">
+    <parallel>
+      <antcall target="server_vel0"/>
+      <antcall target="server_vel1"/>
+      <antcall target="server_vel2"/>
+	  <antcall target="server_vel3"/>
+	  <antcall target="server_vel4"/>
+    </parallel>
+  </target>
+	<!-- Fin serveurs pour vel2 -->
+	
   <target name="servers"
           description="--> Starts 3 servers in a distributed configuration">
     <parallel>
@@ -264,20 +327,9 @@
   </target>
 
   <!-- **************************************************
-       * Classic Sample
+       * Diffusion des actions
        ************************************************** -->
-
-  <!-- Setup the classic configuration -->
-  <target name="test" depends="simple_init"
-          description="--> ">
-    <java classname="classic.test"
-      failonerror="no" fork="yes"
-      dir="${run.dir}">
-      <classpath path="${project.class.path}"/>
-    </java>
-  </target>
   
-  <!-- Début diffusion des actions -->
   <!-- Diffusion des actions -->
   <target name="diffuse_actions" depends="simple_init"
           description="--> ">
@@ -297,9 +349,11 @@
       <classpath path="${project.class.path}"/>
     </java>
   </target>
-  <!-- Fin diffusion des actions -->
   
-  <!-- Début vente en ligne v1 -->
+  <!-- **************************************************
+       * Vente en ligne - version 1
+       ************************************************** -->
+  
   <!-- Administration des canaux -->
   <target name="vel_admin" depends="simple_init"
           description="--> ">
@@ -349,7 +403,74 @@
       <classpath path="${project.class.path}"/>
     </java>
   </target>
-  <!-- Fin vente en ligne v1 -->
+  
+  <!-- **************************************************
+       * Vente en ligne - version 2
+       ************************************************** -->
+  
+  <!-- Administration des canaux -->
+  <target name="vel2_admin" depends="simple_init"
+          description="--> ">
+    <java classname="venteEnLigneV2.VELAdmin"
+      failonerror="no" fork="yes"
+      dir="${run.dir}">
+      <classpath path="${project.class.path}"/>
+    </java>
+  </target>
+  
+  <!-- Service validation -->
+  <target name="vel2_validation" depends="simple_init"
+          description="--> ">
+    <java classname="venteEnLigneV2.validation.Validation"
+      failonerror="no" fork="yes"
+      dir="${run.dir}">
+      <classpath path="${project.class.path}"/>
+    </java>
+  </target>
+  
+  <!-- Service preparation -->
+  <target name="vel2_preparation" depends="simple_init"
+          description="--> ">
+    <java classname="venteEnLigneV2.preparation.Preparation"
+      failonerror="no" fork="yes"
+      dir="${run.dir}">
+      <classpath path="${project.class.path}"/>
+    </java>
+  </target>
+  
+  <!-- Service facturation -->
+  <target name="vel2_facturation" depends="simple_init"
+          description="--> ">
+    <java classname="venteEnLigneV2.facturation.Facturation"
+      failonerror="no" fork="yes"
+      dir="${run.dir}">
+      <classpath path="${project.class.path}"/>
+    </java>
+  </target>
+  
+  <!-- Service expédition -->
+  <target name="vel2_expedition" depends="simple_init"
+          description="--> ">
+    <java classname="venteEnLigneV2.expedition.Expedition"
+      failonerror="no" fork="yes"
+      dir="${run.dir}">
+      <classpath path="${project.class.path}"/>
+    </java>
+  </target>
+  
+  <!-- **************************************************
+       * Classic Sample
+       ************************************************** -->
+
+  <!-- Setup the classic configuration -->
+  <target name="test" depends="simple_init"
+          description="--> ">
+    <java classname="classic.test"
+      failonerror="no" fork="yes"
+      dir="${run.dir}">
+      <classpath path="${project.class.path}"/>
+    </java>
+  </target>
   
   <!-- Setup the classic configuration -->
   <target name="classic_admin" depends="simple_init"

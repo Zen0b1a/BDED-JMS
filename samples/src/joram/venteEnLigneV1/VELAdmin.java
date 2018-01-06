@@ -45,12 +45,10 @@ public class VELAdmin
 		facturation.setWriter(facturationUser);
 
 		QueueConnectionFactory qcf = TcpConnectionFactory.create(InetAddress.getLocalHost().getHostAddress(), 16010);
-		TopicConnectionFactory tcf = TcpConnectionFactory.create(InetAddress.getLocalHost().getHostAddress(), 16010);
 
 		javax.naming.Context jndiCtx = new javax.naming.InitialContext();
 		jndiCtx.bind("cf", cf);
 		jndiCtx.bind("qcf", qcf);
-		jndiCtx.bind("tcf", tcf);
 		jndiCtx.bind("validation", validation);
 		jndiCtx.bind("preparation", preparation);
 		jndiCtx.bind("facturation", facturation);
