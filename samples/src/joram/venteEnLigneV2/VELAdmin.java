@@ -47,7 +47,7 @@ public class VELAdmin
 		prop.setProperty("producThreshold","1000");
 		prop.setProperty("consumThreshold","5");
 		prop.setProperty("autoEvalThreshold","false");
-		prop.setProperty("waitAfterClusterReq","10000");
+		prop.setProperty("waitAfterClusterReq","0");
 		
 		//Queue validation->préparation
 		Queue validation1 = Queue.create(1, "validation1", Queue.CLUSTER_QUEUE, prop);

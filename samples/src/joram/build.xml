@@ -268,7 +268,7 @@
       <antcall target="vel_server1"/>
       <antcall target="vel_server2"/>
 	  <antcall target="vel_server3"/>
-	  <antcall target="vel_server"/>
+	  <antcall target="vel_server4"/>
     </parallel>
   </target>
 	<!-- Fin serveurs pour vel2 -->
@@ -404,6 +404,17 @@
     </java>
   </target>
   
+  <target name="vel_adminxml" depends="simple_init"
+          description="-->  Runs XML administration script for vel2 (distributed architecture)">
+    <copy file="${src.dir}/venteEnLigneV1/VELAdmin.xml" overwrite="true" todir="${run.dir}"/>
+    <java classname="org.objectweb.joram.client.jms.admin.AdminModule"
+      failonerror="no" fork="yes"
+      dir="${run.dir}">
+      <classpath path="${project.class.path}"/>
+      <arg line="./VELAdmin.xml"/>
+    </java>
+  </target>
+  
   <!-- **************************************************
        * Vente en ligne - version 2
        ************************************************** -->
@@ -455,6 +466,17 @@
       failonerror="no" fork="yes"
       dir="${run.dir}">
       <classpath path="${project.class.path}"/>
+    </java>
+  </target>
+  
+  <target name="vel2_adminxml" depends="simple_init"
+          description="-->  Runs XML administration script for vel2 (distributed architecture)">
+    <copy file="${src.dir}/venteEnLigneV2/VELAdmin.xml" overwrite="true" todir="${run.dir}"/>
+    <java classname="org.objectweb.joram.client.jms.admin.AdminModule"
+      failonerror="no" fork="yes"
+      dir="${run.dir}">
+      <classpath path="${project.class.path}"/>
+      <arg line="./VELAdmin.xml"/>
     </java>
   </target>
   

@@ -1,0 +1,120 @@
+<?xml version="1.0"?>
+<JoramAdmin>
+	<TcpAdminModule host="localhost" port="16010" name="root" password="root">
+		<property name="connectingTimer" value="60"/>
+	</TcpAdminModule>
+
+	<InitialContext>
+		<property name="java.naming.factory.initial" value="fr.dyade.aaa.jndi2.client.NamingContextFactory"/>
+		<property name="java.naming.factory.host" value="localhost" />
+		<property name="java.naming.factory.port" value="16400" />
+	</InitialContext>
+
+	<TcpConnectionFactory name="cf1" host="localhost" port="16011">
+		<jndi name="cf1"/>
+	</TcpConnectionFactory>
+
+	<TcpConnectionFactory name="cf2" host="localhost" port="16012">
+		<jndi name="cf2"/>
+	</TcpConnectionFactory>
+	
+	<TcpConnectionFactory name="cf3" host="localhost" port="16013">
+		<jndi name="cf3"/>
+	</TcpConnectionFactory>
+	
+	<TcpConnectionFactory name="cf4" host="localhost" port="16014">
+		<jndi name="cf4"/>
+	</TcpConnectionFactory>
+
+	<User name="user_validation" login="validation" password="validation" serverId="1"/>
+	<User name="user_preparation" login="preparation" password="preparation" serverId="2"/>
+	<User name="user_facturation" login="facturation" password="facturation" serverId="3"/>
+	<User name="user_expedition" login="expedition" password="expedition" serverId="4"/>
+
+	<Queue name="validation1" serverId="1"
+		className="org.objectweb.joram.mom.dest.ClusterQueue">
+		<property name="period" value="100" />
+		<property name="producThreshold" value="25" />
+		<property name="consumThreshold" value="2" />
+		<property name="autoEvalThreshold" value="false" />
+		<property name="waitAfterClusterReq" value="100" />
+	</Queue>
+
+	<Queue name="validation2" serverId="2"
+		className="org.objectweb.joram.mom.dest.ClusterQueue">
+		<property name="period" value="100" />
+		<property name="producThreshold" value="25" />
+		<property name="consumThreshold" value="2" />
+		<property name="autoEvalThreshold" value="false" />
+		<property name="waitAfterClusterReq" value="100" />
+	</Queue>
+
+	<Queue name="preparation2" serverId="2"
+		className="org.objectweb.joram.mom.dest.ClusterQueue">
+		<property name="period" value="100" />
+		<property name="producThreshold" value="25" />
+		<property name="consumThreshold" value="2" />
+		<property name="autoEvalThreshold" value="false" />
+		<property name="waitAfterClusterReq" value="100" />
+	</Queue>
+
+	<Queue name="preparation3" serverId="3"
+		className="org.objectweb.joram.mom.dest.ClusterQueue">
+		<property name="period" value="100" />
+		<property name="producThreshold" value="25" />
+		<property name="consumThreshold" value="2" />
+		<property name="autoEvalThreshold" value="false" />
+		<property name="waitAfterClusterReq" value="100" />
+	</Queue>
+
+	<Queue name="facturation3" serverId="3"
+		className="org.objectweb.joram.mom.dest.ClusterQueue">
+		<property name="period" value="100" />
+		<property name="producThreshold" value="25" />
+		<property name="consumThreshold" value="2" />
+		<property name="autoEvalThreshold" value="false" />
+		<property name="waitAfterClusterReq" value="100" />
+	</Queue>
+
+	<Queue name="facturation4" serverId="4"
+		className="org.objectweb.joram.mom.dest.ClusterQueue">
+		<property name="period" value="100" />
+		<property name="producThreshold" value="25" />
+		<property name="consumThreshold" value="2" />
+		<property name="autoEvalThreshold" value="false" />
+		<property name="waitAfterClusterReq" value="100" />
+	</Queue>
+	
+	<ClusterCF>
+		<ClusterElement name="cf1" location="server1" />
+		<ClusterElement name="cf2" location="server2" />
+		<ClusterElement name="cf3" location="server3" />
+		<ClusterElement name="cf4" location="server4" />
+		<jndi name="cf" />
+	</ClusterCF>
+
+	<ClusterQueue>
+		<ClusterElement name="validation1" location="server1" />
+		<ClusterElement name="validation2" location="server2" />
+		<writer user="user_validation" />
+		<reader user="user_preparation" />
+		<jndi name="validation" />
+	</ClusterQueue>
+	
+	<ClusterQueue>
+		<ClusterElement name="preparation2" location="server2" />
+		<ClusterElement name="preparation3" location="server3" />
+		<writer user="user_preparation" />
+		<reader user="user_facturation" />
+		<jndi name="preparation" />
+	</ClusterQueue>
+	
+	<ClusterQueue>
+		<ClusterElement name="facturation3" location="server3" />
+		<ClusterElement name="facturation4" location="server4" />
+		<writer user="user_facturation" />
+		<reader user="user_expedition" />
+		<jndi name="facturation" />
+	</ClusterQueue>
+
+</JoramAdmin>
