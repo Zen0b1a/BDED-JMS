@@ -21,13 +21,14 @@ public class Facturation
 		int id_commande = -1;
 		boolean commande_valide = true;
 		boolean continuer = true;
+		System.setProperty("location", "server3");
 		
 		//Queue pour recevoir les messages du service preparation
-		QueueConnectionFactory qcf = (QueueConnectionFactory) ictx.lookup("cf3");
-		QueueConnection cnx = qcf.createQueueConnection("facturation", "facturation");
-		QueueSession session = cnx.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
-		Queue queue = (Queue) ictx.lookup("preparation3");
-		QueueReceiver receiver = session.createReceiver(queue);
+		ConnectionFactory cf = (ConnectionFactory) ictx.lookup("cf");
+		Connection cnx = cf.createConnection("facturation", "facturation");
+		Session session = cnx.createSession(false, Session.AUTO_ACKNOWLEDGE);
+		Queue queue = (Queue) ictx.lookup("preparation");
+		MessageConsumer receiver = session.createConsumer(queue);
 		
 		cnx.start();
 		
@@ -71,14 +72,14 @@ public class Facturation
 		connexion.closeConnexion();
 	}
 	
-	private boolean envoiMessage(QueueSession session, int id_commande, boolean commande_valide)
+	private boolean envoiMessage(Session session, int id_commande, boolean commande_valide)
 	{
 		try
 		{
 			System.out.println("Envoi d'un message pour la commande "+id_commande+" facturée : "+commande_valide);
 			
-			Queue queue = (Queue) ictx.lookup("facturation3");
-			QueueSender sender = session.createSender(queue);
+			Queue queue = (Queue) ictx.lookup("facturation");
+			MessageProducer sender = session.createProducer(queue);
 			
 			MapMessage msg = session.createMapMessage();
 			msg.setInt("id", id_commande);

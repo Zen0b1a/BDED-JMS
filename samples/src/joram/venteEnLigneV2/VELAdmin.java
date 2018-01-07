@@ -4,13 +4,12 @@ import java.net.InetAddress;
 
 import java.util.Properties;
 
-import javax.jms.ConnectionFactory;
-import javax.jms.QueueConnectionFactory;
-import javax.jms.TopicConnectionFactory;
-
+import org.objectweb.joram.client.jms.ConnectionFactory;
 import org.objectweb.joram.client.jms.Queue;
 import org.objectweb.joram.client.jms.Topic;
 import org.objectweb.joram.client.jms.admin.AdminModule;
+import org.objectweb.joram.client.jms.admin.ClusterConnectionFactory;
+import org.objectweb.joram.client.jms.admin.ClusterQueue;
 import org.objectweb.joram.client.jms.admin.User;
 import org.objectweb.joram.client.jms.tcp.TcpConnectionFactory;
 
@@ -30,6 +29,12 @@ public class VELAdmin
 		ConnectionFactory cf2 = TcpConnectionFactory.create(InetAddress.getLocalHost().getHostAddress(), 16012);
 		ConnectionFactory cf3 = TcpConnectionFactory.create(InetAddress.getLocalHost().getHostAddress(), 16013);
 		ConnectionFactory cf4 = TcpConnectionFactory.create(InetAddress.getLocalHost().getHostAddress(), 16014);
+		
+		ClusterConnectionFactory cf = new ClusterConnectionFactory();
+		cf.addConnectionFactory("server1", cf1);
+		cf.addConnectionFactory("server2", cf2);
+		cf.addConnectionFactory("server3", cf3);
+		cf.addConnectionFactory("server4", cf4);
 
 		//Définition des utilisateurs
 		User validationUser = User.create("validation", "validation", 1);
@@ -46,37 +51,43 @@ public class VELAdmin
 		
 		//Queue validation->préparation
 		Queue validation1 = Queue.create(1, "validation1", Queue.CLUSTER_QUEUE, prop);
-		validation1.setWriter(validationUser);
 		Queue validation2 = Queue.create(2, "validation2", Queue.CLUSTER_QUEUE, prop);
-		validation2.setReader(preparationUser);
 		validation1.addClusteredQueue(validation2);
+		ClusterQueue validation = new ClusterQueue();
+		validation.addDestination("server1", validation1);
+		validation.addDestination("server2", validation2);
+		validation.setWriter(validationUser);
+		validation.setReader(preparationUser);
+		System.out.println("Cluster de queues de validation créée.");
 		
 		//Queue préparation->facturation
 		Queue preparation2 = Queue.create(2, "preparation2", Queue.CLUSTER_QUEUE, prop);
-		preparation2.setWriter(preparationUser);
 		Queue preparation3 = Queue.create(3, "preparation3", Queue.CLUSTER_QUEUE, prop);
-		preparation3.setReader(facturationUser);
 		preparation2.addClusteredQueue(preparation3);
+		ClusterQueue preparation = new ClusterQueue();
+		preparation.addDestination("server2", preparation2);
+		preparation.addDestination("server3", preparation3);
+		preparation.setWriter(preparationUser);
+		preparation.setReader(facturationUser);
+		System.out.println("Cluster de queues de préparation créée.");
 		
 		//Queue facturation->expédition
 		Queue facturation3 = Queue.create(3, "facturation3", Queue.CLUSTER_QUEUE, prop);
-		facturation3.setWriter(facturationUser);
 		Queue facturation4 = Queue.create(4, "facturation4", Queue.CLUSTER_QUEUE, prop);
-		facturation4.setReader(expeditionUser);
 		facturation3.addClusteredQueue(facturation4);
+		ClusterQueue facturation = new ClusterQueue();
+		facturation.addDestination("server3", facturation3);
+		facturation.addDestination("server4", facturation4);
+		facturation.setWriter(facturationUser);
+		facturation.setReader(expeditionUser);
+		System.out.println("Cluster de queues de facturation créée.");
 
 		javax.naming.Context jndiCtx = new javax.naming.InitialContext();
-		jndiCtx.bind("cf1", cf1);
-		jndiCtx.bind("cf2", cf2);
-		jndiCtx.bind("cf3", cf3);
-		jndiCtx.bind("cf4", cf4);
+		jndiCtx.bind("cf", cf);
 		
-		jndiCtx.bind("validation1", validation1);
-		jndiCtx.bind("validation2", validation2);
-		jndiCtx.bind("preparation2", preparation2);
-		jndiCtx.bind("preparation3", preparation3);
-		jndiCtx.bind("facturation3", facturation3);
-		jndiCtx.bind("facturation4", facturation4);
+		jndiCtx.bind("validation", validation);
+		jndiCtx.bind("preparation", preparation);
+		jndiCtx.bind("facturation", facturation);
 		jndiCtx.close();
 
 		AdminModule.disconnect();

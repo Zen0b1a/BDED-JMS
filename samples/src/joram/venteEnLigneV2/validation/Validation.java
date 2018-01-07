@@ -77,22 +77,23 @@ public class Validation
 	{
 		try
 		{
+			System.setProperty("location", "server1");
 			System.out.println("Envoi d'un message pour la commande "+id_commande+" validée : "+commande_valide);
 			ictx = new InitialContext();
-			Queue queue = (Queue) ictx.lookup("validation1");
-			QueueConnectionFactory qcf = (QueueConnectionFactory) ictx.lookup("cf1");
+			Queue queue = (Queue) ictx.lookup("validation");
+			ConnectionFactory cf = (ConnectionFactory) ictx.lookup("cf");
 			ictx.close();
 
-			QueueConnection cnx = qcf.createQueueConnection("validation", "validation");
-			QueueSession session = cnx.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
-			QueueSender sender = session.createSender(queue);
-			
+			Connection cnx = cf.createConnection("validation", "validation");
+			System.out.println(cf.toString());
+			Session session = cnx.createSession(false, Session.AUTO_ACKNOWLEDGE);
+			MessageProducer sender = session.createProducer(queue);
+
 			MapMessage msg = session.createMapMessage();
 			msg.setInt("id", id_commande);
 			msg.setBoolean("valide", commande_valide);
-			
 			sender.send(msg);
-			
+
 			cnx.close();
 			return true;
 		}

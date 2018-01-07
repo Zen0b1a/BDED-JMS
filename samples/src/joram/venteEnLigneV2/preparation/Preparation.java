@@ -23,13 +23,14 @@ public class Preparation
 		int id_commande = -1;
 		boolean commande_valide = true;
 		boolean continuer = true;
+		System.setProperty("location", "server2");
 		
 		//Queue pour recevoir les messages du service validation
-		QueueConnectionFactory qcf = (QueueConnectionFactory) ictx.lookup("cf2");
-		QueueConnection cnx = qcf.createQueueConnection("preparation", "preparation");
-		QueueSession session = cnx.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
-		Queue queue = (Queue) ictx.lookup("validation2");
-		QueueReceiver receiver = session.createReceiver(queue);
+		ConnectionFactory cf = (ConnectionFactory) ictx.lookup("cf");
+		Connection cnx = cf.createConnection("preparation", "preparation");
+		Session session = cnx.createSession(false, Session.AUTO_ACKNOWLEDGE);
+		Queue queue = (Queue) ictx.lookup("validation");
+		MessageConsumer receiver = session.createConsumer(queue);
 		
 		cnx.start();
 		
@@ -82,14 +83,14 @@ public class Preparation
 		connexion.closeConnexion();
 	}
 	
-	private boolean envoiMessage(QueueSession session, int id_commande, boolean commande_valide)
+	private boolean envoiMessage(Session session, int id_commande, boolean commande_valide)
 	{
 		try
 		{
 			System.out.println("Envoi d'un message pour la commande "+id_commande+" preparée : "+commande_valide);
 			
-			Queue queue = (Queue) ictx.lookup("preparation2");
-			QueueSender sender = session.createSender(queue);
+			Queue queue = (Queue) ictx.lookup("preparation");
+			MessageProducer sender = session.createProducer(queue);
 			
 			MapMessage msg = session.createMapMessage();
 			msg.setInt("id", id_commande);

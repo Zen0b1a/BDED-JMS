@@ -21,13 +21,14 @@ public class Expedition
 		int id_commande = -1;
 		boolean commande_valide = true;
 		boolean continuer = true;
+		System.setProperty("location", "server4");
 		
 		//Queue pour recevoir les messages du service facturation
-		QueueConnectionFactory qcf = (QueueConnectionFactory) ictx.lookup("cf4");
-		QueueConnection cnx = qcf.createQueueConnection("expedition", "expedition");
-		QueueSession session = cnx.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
-		Queue queue = (Queue) ictx.lookup("facturation4");
-		QueueReceiver receiver = session.createReceiver(queue);
+		ConnectionFactory cf = (ConnectionFactory)ictx.lookup("cf");
+		Connection cnx = cf.createConnection("expedition", "expedition");
+		Session session = cnx.createSession(false, Session.AUTO_ACKNOWLEDGE);
+		Queue queue = (Queue) ictx.lookup("facturation");
+		MessageConsumer receiver = session.createConsumer(queue);
 		
 		cnx.start();
 		

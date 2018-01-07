@@ -211,7 +211,7 @@
   </target>
 	
 	<!-- Serveurs pour vel2 -->
-	<target name="server_vel0" depends="init"
+	<target name="vel_server0" depends="init"
           description="--> Démarre un serveur pour vente en ligne (id 0)">
     <antcall target="server">
       <param name="sid" value="0"/>
@@ -221,7 +221,7 @@
     </antcall>
   </target>
   
-  <target name="server_vel1" depends="init"
+  <target name="vel_server1" depends="init"
           description="--> Démarre un serveur pour vente en ligne (id 1)">
     <antcall target="server">
       <param name="sid" value="1"/>
@@ -231,7 +231,7 @@
     </antcall>
   </target>
   
-  <target name="server_vel2" depends="init"
+  <target name="vel_server2" depends="init"
           description="--> Démarre un serveur pour vente en ligne (id 2)">
     <antcall target="server">
       <param name="sid" value="2"/>
@@ -241,7 +241,7 @@
     </antcall>
   </target>
   
-  <target name="server_vel3" depends="init"
+  <target name="vel_server3" depends="init"
           description="--> Démarre un serveur pour vente en ligne (id 3)">
     <antcall target="server">
       <param name="sid" value="3"/>
@@ -251,7 +251,7 @@
     </antcall>
   </target>
   
-  <target name="server_vel4" depends="init"
+  <target name="vel_server4" depends="init"
           description="--> Démarre un serveur pour vente en ligne (id 4)">
     <antcall target="server">
       <param name="sid" value="4"/>
@@ -261,14 +261,14 @@
     </antcall>
   </target>
   
-  <target name="servers_vel"
+  <target name="vel_servers"
           description="--> Démarre les serveurs de vente en ligne">
     <parallel>
-      <antcall target="server_vel0"/>
-      <antcall target="server_vel1"/>
-      <antcall target="server_vel2"/>
-	  <antcall target="server_vel3"/>
-	  <antcall target="server_vel4"/>
+      <antcall target="vel_server0"/>
+      <antcall target="vel_server1"/>
+      <antcall target="vel_server2"/>
+	  <antcall target="vel_server3"/>
+	  <antcall target="vel_server"/>
     </parallel>
   </target>
 	<!-- Fin serveurs pour vel2 -->
