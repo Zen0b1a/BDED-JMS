@@ -1,6 +1,14 @@
 package venteEnLigneV1;
 
+import gestionBD.ConnexionFactory;
+import gestionBD.ConnexionFactoryImpl;
+
 import java.net.InetAddress;
+
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+
+import java.util.Hashtable;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.QueueConnectionFactory;
@@ -45,10 +53,16 @@ public class VELAdmin
 		facturation.setWriter(facturationUser);
 
 		QueueConnectionFactory qcf = TcpConnectionFactory.create(InetAddress.getLocalHost().getHostAddress(), 16010);
-
-		javax.naming.Context jndiCtx = new javax.naming.InitialContext();
+		ConnexionFactory cfBD = new ConnexionFactoryImpl();
+		
+		Registry registry = LocateRegistry.createRegistry(1099);
+		Hashtable<Object,Object> env = new Hashtable();
+		env.put(javax.naming.Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.rmi.registry.RegistryContextFactory");
+		env.put(javax.naming.Context.PROVIDER_URL, "rmi://localhost:1099");
+		javax.naming.Context jndiCtx = new javax.naming.InitialContext(env);
 		jndiCtx.bind("cf", cf);
 		jndiCtx.bind("qcf", qcf);
+		jndiCtx.bind("cfBD", cfBD);
 		jndiCtx.bind("validation", validation);
 		jndiCtx.bind("preparation", preparation);
 		jndiCtx.bind("facturation", facturation);

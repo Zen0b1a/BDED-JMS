@@ -1,12 +1,14 @@
 package venteEnLigneV1.validation;
 
+import gestionBD.Connexion;
+import gestionBD.ConnexionFactory;
+
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Scanner;
 
 import javax.jms.*;
 import javax.naming.*;
-
-import venteEnLigneV1.Connexion;
 
 public class Validation 
 {
@@ -19,7 +21,13 @@ public class Validation
 	
 	public Validation() throws Exception
 	{
-		Connexion connexion = new Connexion();
+		Hashtable<Object,Object> env = new Hashtable();
+		env.put(javax.naming.Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.rmi.registry.RegistryContextFactory");
+		env.put(javax.naming.Context.PROVIDER_URL, "rmi://localhost:1099");
+		ictx = new InitialContext(env);
+		//ictx = new InitialContext();
+		ConnexionFactory cfBD = (ConnexionFactory)ictx.lookup("cfBD");
+		Connexion connexion = cfBD.getConnexion();
 		int id_commande = -1;
 		boolean commande_valide = true;
 		
@@ -70,7 +78,8 @@ public class Validation
 			System.out.println("Il n'y a pas de commande en attente de validation");
 		
 		//Fermeture de la connexion
-		connexion.closeConnexion();
+		cfBD.libereConnexion(connexion);
+		ictx.close();
 	}
 	
 	private boolean envoiMessage(int id_commande, boolean commande_valide)
@@ -78,10 +87,8 @@ public class Validation
 		try
 		{
 			System.out.println("Envoi d'un message pour la commande "+id_commande+" validée : "+commande_valide);
-			ictx = new InitialContext();
 			Queue queue = (Queue) ictx.lookup("validation");
 			QueueConnectionFactory qcf = (QueueConnectionFactory) ictx.lookup("qcf");
-			ictx.close();
 
 			QueueConnection cnx = qcf.createQueueConnection("validation", "validation");
 			QueueSession session = cnx.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
