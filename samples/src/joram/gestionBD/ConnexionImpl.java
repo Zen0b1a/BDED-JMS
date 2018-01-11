@@ -17,11 +17,13 @@ import oracle.jdbc.OracleDriver;
 public class ConnexionImpl extends UnicastRemoteObject implements Connexion
 {
 	private Connection connexion;
+	private int id;
 	
 	//Initialisation de la connexion
-	public ConnexionImpl(Connection connexion) throws RemoteException
+	public ConnexionImpl(Connection connexion, int id) throws RemoteException
 	{
 		this.connexion = connexion;
+		this.id = id;
 	}
 	
 	public Connection getConnexion()
@@ -29,7 +31,14 @@ public class ConnexionImpl extends UnicastRemoteObject implements Connexion
 		return this.connexion;
 	}
 	
+	@Override
+	public int getId() throws RemoteException
+	{
+		return this.id;
+	}
+	
 	//Obtenir l'état d'une commande
+	@Override
 	public String getEtatCommande(int id_commande) throws RemoteException
 	{
 		String etat = "";
@@ -48,6 +57,7 @@ public class ConnexionImpl extends UnicastRemoteObject implements Connexion
 	}
 	
 	//Changer l'état d'une commande
+	@Override
 	public boolean setEtatCommande(int id_commande, String etat) throws RemoteException
 	{
 		if(etat.equals("initiee") || etat.equals("validee") || etat.equals("preparee") || etat.equals("payee") || etat.equals("expediee"))
@@ -71,6 +81,7 @@ public class ConnexionImpl extends UnicastRemoteObject implements Connexion
 	}
 	
 	//Liste des commandes dans un état donné
+	@Override
 	public List<Integer> getCommandes(String etat) throws RemoteException
 	{
 		List<Integer> commandes = new ArrayList();
@@ -89,6 +100,7 @@ public class ConnexionImpl extends UnicastRemoteObject implements Connexion
 	}
 	
 	//Vérification du stock
+	@Override
 	public boolean stockSuffisant(int id_commande) throws RemoteException
 	{
 		boolean stockOK = true;
@@ -119,6 +131,7 @@ public class ConnexionImpl extends UnicastRemoteObject implements Connexion
 	}
 	
 	//Mise à jour du stock
+	@Override
 	public boolean majStock(int id_commande) throws RemoteException
 	{
 		try

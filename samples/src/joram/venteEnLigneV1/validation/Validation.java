@@ -21,12 +21,14 @@ public class Validation
 	
 	public Validation() throws Exception
 	{
-		Hashtable<Object,Object> env = new Hashtable();
-		env.put(javax.naming.Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.rmi.registry.RegistryContextFactory");
-		env.put(javax.naming.Context.PROVIDER_URL, "rmi://localhost:1099");
+		//Récupération des paramètres pour accéder au rmiregistry
+		ictx = new InitialContext();
+		Hashtable<Object,Object> env = (Hashtable)ictx.lookup("env_rmi");
+		//Récupération de la ConnexionFactory depuis le rmiregistry
 		ictx = new InitialContext(env);
-		//ictx = new InitialContext();
 		ConnexionFactory cfBD = (ConnexionFactory)ictx.lookup("cfBD");
+		//Retour sur l'annuaire jndi
+		ictx = new InitialContext();
 		Connexion connexion = cfBD.getConnexion();
 		int id_commande = -1;
 		boolean commande_valide = true;

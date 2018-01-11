@@ -53,19 +53,24 @@ public class VELAdmin
 		facturation.setWriter(facturationUser);
 
 		QueueConnectionFactory qcf = TcpConnectionFactory.create(InetAddress.getLocalHost().getHostAddress(), 16010);
-		ConnexionFactory cfBD = new ConnexionFactoryImpl();
 		
+		ConnexionFactory cfBD = new ConnexionFactoryImpl();
 		Registry registry = LocateRegistry.createRegistry(1099);
 		Hashtable<Object,Object> env = new Hashtable();
 		env.put(javax.naming.Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.rmi.registry.RegistryContextFactory");
-		env.put(javax.naming.Context.PROVIDER_URL, "rmi://localhost:1099");
-		javax.naming.Context jndiCtx = new javax.naming.InitialContext(env);
+		env.put(javax.naming.Context.PROVIDER_URL, "rmi://" + InetAddress.getLocalHost().getHostAddress() + ":1099");
+		
+		javax.naming.Context jndiCtx = new javax.naming.InitialContext();
+		jndiCtx.bind("env_rmi", env);
 		jndiCtx.bind("cf", cf);
 		jndiCtx.bind("qcf", qcf);
-		jndiCtx.bind("cfBD", cfBD);
 		jndiCtx.bind("validation", validation);
 		jndiCtx.bind("preparation", preparation);
 		jndiCtx.bind("facturation", facturation);
+		
+		//Enregistrement de l'ObjectFactory pour les connexions à la BD
+		jndiCtx = new javax.naming.InitialContext(env);
+		jndiCtx.bind("cfBD", cfBD);
 		jndiCtx.close();
 
 		AdminModule.disconnect();

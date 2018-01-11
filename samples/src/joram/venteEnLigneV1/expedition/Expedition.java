@@ -1,9 +1,12 @@
 package venteEnLigneV1.expedition;
 
+import gestionBD.Connexion;
+import gestionBD.ConnexionFactory;
+
+import java.util.Hashtable;
+
 import javax.jms.*;
 import javax.naming.*;
-
-import venteEnLigneV1.Connexion;
 
 public class Expedition
 {
@@ -16,8 +19,15 @@ public class Expedition
 	
 	public Expedition() throws Exception
 	{
+		//Récupération des paramètres pour accéder au rmiregistry
 		ictx = new InitialContext();
-		Connexion connexion = new Connexion();
+		Hashtable<Object,Object> env = (Hashtable)ictx.lookup("env_rmi");
+		//Récupération de la ConnexionFactory depuis le rmiregistry
+		ictx = new InitialContext(env);
+		ConnexionFactory cfBD = (ConnexionFactory)ictx.lookup("cfBD");
+		//Retour sur l'annuaire jndi
+		ictx = new InitialContext();
+		Connexion connexion = cfBD.getConnexion();
 		int id_commande = -1;
 		boolean commande_valide = true;
 		boolean continuer = true;
@@ -65,8 +75,8 @@ public class Expedition
 		}
 		
 		//Fermeture
+		cfBD.libereConnexion(connexion);
 		ictx.close();
 		cnx.close();
-		connexion.closeConnexion();
 	}
 }

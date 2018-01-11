@@ -12,4 +12,5 @@ public interface Connexion extends Remote
 	public List<Integer> getCommandes(String etat) throws RemoteException;
 	public boolean stockSuffisant(int id_commande) throws RemoteException;
 	public boolean majStock(int id_commande) throws RemoteException;
+	public int getId() throws RemoteException;
 }

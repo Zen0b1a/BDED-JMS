@@ -13,7 +13,7 @@ public class ConnexionPool
     final private String MDP = "ag092850";
     final private String URL_FAC = "jdbc:oracle:thin:@butor:1521:ensb2017";
     final private String URL_EXTERIEUR = "jdbc:oracle:thin:@ufrsciencestech.u-bourgogne.fr:25561:ensb2017";
-    static final int INITIAL_CAPACITY = 10;
+    static final int INITIAL_CAPACITY = 5;
     private LinkedList<Connection> pool;
     
     private Connection choixConnexion()

@@ -1,11 +1,13 @@
 package venteEnLigneV1.preparation;
 
+import gestionBD.Connexion;
+import gestionBD.ConnexionFactory;
+
+import java.util.Hashtable;
 import java.util.List;
 
 import javax.jms.*;
 import javax.naming.*;
-
-import venteEnLigneV1.Connexion;
 
 public class Preparation
 {
@@ -18,8 +20,15 @@ public class Preparation
 	
 	public Preparation() throws Exception
 	{
+		//Récupération des paramètres pour accéder au rmiregistry
 		ictx = new InitialContext();
-		Connexion connexion = new Connexion();
+		Hashtable<Object,Object> env = (Hashtable)ictx.lookup("env_rmi");
+		//Récupération de la ConnexionFactory depuis le rmiregistry
+		ictx = new InitialContext(env);
+		ConnexionFactory cfBD = (ConnexionFactory)ictx.lookup("cfBD");
+		//Retour sur l'annuaire jndi
+		ictx = new InitialContext();
+		Connexion connexion = cfBD.getConnexion();
 		int id_commande = -1;
 		boolean commande_valide = true;
 		boolean continuer = true;
@@ -77,9 +86,9 @@ public class Preparation
 		}
 		
 		//Fermeture
+		cfBD.libereConnexion(connexion);
 		ictx.close();
 		cnx.close();
-		connexion.closeConnexion();
 	}
 	
 	private boolean envoiMessage(QueueSession session, int id_commande, boolean commande_valide)

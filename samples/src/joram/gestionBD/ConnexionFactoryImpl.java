@@ -8,36 +8,39 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Hashtable;
 
 public class ConnexionFactoryImpl extends UnicastRemoteObject implements ConnexionFactory
 {
     private ConnexionPool connexionPool;
-	private List<ConnexionImpl> connexions;
+	private Hashtable<Integer, ConnexionImpl> connexions;
     
     public ConnexionFactoryImpl() throws RemoteException 
     {
         super();
         this.connexionPool = new ConnexionPool();
-		this.connexions = new ArrayList();
+		this.connexions = new Hashtable();
     }
     
 	@Override
     public synchronized Connexion getConnexion() throws RemoteException
     {
-		ConnexionImpl connexion = new ConnexionImpl(this.connexionPool.getConnexion());
-		this.connexions.add(connexion);
+		int id = 0;
+		while(this.connexions.containsKey(id))
+			id++;
+		ConnexionImpl connexion = new ConnexionImpl(this.connexionPool.getConnexion(), id);
+		this.connexions.put(id, connexion);
         return (Connexion)connexion;
     }
     
     @Override
     public synchronized void libereConnexion(Connexion connexion) throws RemoteException
     {
-		if(this.connexions.contains(connexion))
+		int id = connexion.getId();
+		if(this.connexions.containsKey(id))
 		{
-			this.connexionPool.returnConnexion(connexions.get(connexions.indexOf(connexion)).getConnexion());
-			this.connexions.remove(connexion);
+			this.connexionPool.returnConnexion(this.connexions.get(id).getConnexion());
+			this.connexions.remove(id);
 			System.out.println("Connexion libérée.");
 		}
     }
