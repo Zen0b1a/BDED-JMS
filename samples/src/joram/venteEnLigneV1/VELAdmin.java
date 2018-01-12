@@ -74,6 +74,6 @@ public class VELAdmin
 		jndiCtx.close();
 
 		AdminModule.disconnect();
-		System.out.println("Admin closed.");
+		System.out.println("Admin terminée.");
 	}
 }

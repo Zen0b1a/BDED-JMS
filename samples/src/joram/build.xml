@@ -404,8 +404,16 @@
     </java>
   </target>
   
-  <!--<target name="vel_adminxml" depends="simple_init"
-          description="->  Runs XML administration script for vel (distributed architecture)">
+  <target name="vel_fulladminxml"
+          description="--> Administration avec script xml + ConnexionFactory">
+    <sequential>
+      <antcall target="vel_adminxml"/>
+      <antcall target="vel_adminBD"/>
+    </sequential>
+  </target>
+  
+  <target name="vel_adminxml" depends="simple_init"
+          description="-->  Runs XML administration script for vel (distributed architecture)">
     <copy file="${src.dir}/venteEnLigneV1/VELAdmin.xml" overwrite="true" todir="${run.dir}"/>
     <java classname="org.objectweb.joram.client.jms.admin.AdminModule"
       failonerror="no" fork="yes"
@@ -413,7 +421,16 @@
       <classpath path="${project.class.path}"/>
       <arg line="./VELAdmin.xml"/>
     </java>
-  </target>-->
+  </target>
+  
+  <target name="vel_adminBD" depends="simple_init"
+          description="--> ">
+    <java classname="venteEnLigneV1.VELAdminBD"
+      failonerror="no" fork="yes"
+      dir="${run.dir}">
+      <classpath path="${project.class.path}"/>
+    </java>
+  </target>
   
   <!-- **************************************************
        * Vente en ligne - version 2
