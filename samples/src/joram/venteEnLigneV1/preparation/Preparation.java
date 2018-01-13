@@ -56,29 +56,24 @@ public class Preparation
 				System.out.println("Commande "+id_commande+" reçue, appuyer sur une touche pour la préparer.");
 				System.in.read();
 				
-				//Vérification et mise à jour du stock
-				if(commande_valide = connexion.stockSuffisant(id_commande))
-				{
-					System.out.println("Vérification du stock pour la commande "+id_commande+" OK.");
-					commande_valide = connexion.majStock(id_commande);
-				}
-				else
-					System.out.println("Stock insuffisant pour la commande "+id_commande+", réinitialisation de son état.");
-
+				//Mise à jour du stock
+				commande_valide = connexion.majStockPreparation(id_commande);
+				
 				//Changement de l'état de la commande
 				if(commande_valide)
 				{
 					commande_valide = connexion.setEtatCommande(id_commande, "preparee");
 					//Envoi du message
 					this.envoiMessage(session, id_commande, commande_valide);
+					System.out.println("Commande "+id_commande+" préparée.");
 				}
 				else
-					commande_valide = connexion.setEtatCommande(id_commande, "initiee");
+					connexion.razCommande(id_commande);
 			}
 			else
 			{
 				System.out.println("Commande "+id_commande+" invalide : réinitialisation de son état.");
-				connexion.setEtatCommande(id_commande, "initiee");
+				connexion.razCommande(id_commande);
 			}
 			
 			//Prévoir cas d'arrêt

@@ -61,14 +61,15 @@ public class Facturation
 					commande_valide = connexion.setEtatCommande(id_commande, "payee");
 					//Envoi du message
 					this.envoiMessage(session, id_commande, commande_valide);
+					System.out.println("Commande "+id_commande+" facturée.");
 				}
 				else
-					commande_valide = connexion.setEtatCommande(id_commande, "initiee");
+					connexion.razCommande(id_commande);
 			}
 			else
 			{
 				System.out.println("Commande "+id_commande+" invalide : réinitialisation de son état.");
-				connexion.setEtatCommande(id_commande, "initiee");
+				connexion.razCommande(id_commande);
 			}
 			
 			//Prévoir cas d'arrêt

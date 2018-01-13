@@ -51,20 +51,17 @@ public class Validation
 				}
 			}
 			
-			//Vérification du stock des produits
-			commande_valide = connexion.stockSuffisant(id_commande);
-			
+			//Vérification du stock, changement de l'état en BD et maj du stock de produits de côté
+			commande_valide = connexion.stockSuffisant(id_commande) && connexion.majStockValidation(id_commande) && connexion.setEtatCommande(id_commande, "validee");
+				
 			if(commande_valide)
 			{
-				//Changement de l'état en BD
-				if(commande_valide)
-					commande_valide = connexion.setEtatCommande(id_commande, "validee");
-				
 				//Envoi du message
 				this.envoiMessage(id_commande, commande_valide);
+				System.out.println("Commande "+id_commande+" validée.");
 			}
 			else
-				System.out.println("Validation de la commande "+id_commande+" impossible : stock insuffisant.");
+				System.out.println("Validation de la commande "+id_commande+" impossible : vérifier le stock.");
 		}
 		else
 			System.out.println("Il n'y a pas de commande en attente de validation");
@@ -85,11 +82,11 @@ public class Validation
 			ictx.close();
 
 			Connection cnx = cf.createConnection("validation", "validation");
-			System.out.println(cf.toString());
 			Session session = cnx.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			MessageProducer sender = session.createProducer(queue);
 
 			MapMessage msg = session.createMapMessage();
+			msg.setString("service", "validation");
 			msg.setInt("id", id_commande);
 			msg.setBoolean("valide", commande_valide);
 			sender.send(msg);

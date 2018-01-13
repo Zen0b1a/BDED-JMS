@@ -13,9 +13,6 @@ import org.objectweb.joram.client.jms.admin.ClusterQueue;
 import org.objectweb.joram.client.jms.admin.User;
 import org.objectweb.joram.client.jms.tcp.TcpConnectionFactory;
 
-/**
- * Administers an agent server for the classic samples.
- */
 public class VELAdmin 
 {
 	public static void main(String[] args) throws Exception 
@@ -35,6 +32,10 @@ public class VELAdmin
 		cf.addConnectionFactory("server2", cf2);
 		cf.addConnectionFactory("server3", cf3);
 		cf.addConnectionFactory("server4", cf4);
+		//cf1.getParameters().addOutInterceptor("venteEnLigneV2.Interceptor");
+		cf2.getParameters().addOutInterceptor("venteEnLigneV2.Interceptor");
+		cf3.getParameters().addOutInterceptor("venteEnLigneV2.Interceptor");
+		cf4.getParameters().addOutInterceptor("venteEnLigneV2.Interceptor");
 
 		//Définition des utilisateurs
 		User validationUser = User.create("validation", "validation", 1);
@@ -82,12 +83,17 @@ public class VELAdmin
 		facturation.setReader(expeditionUser);
 		System.out.println("Cluster de queues de facturation créée.");
 
+		//Queue expédition
+		Queue expedition = Queue.create(4);
+		expedition.setWriter(expeditionUser);
+		
 		javax.naming.Context jndiCtx = new javax.naming.InitialContext();
 		jndiCtx.bind("cf", cf);
 		
 		jndiCtx.bind("validation", validation);
 		jndiCtx.bind("preparation", preparation);
 		jndiCtx.bind("facturation", facturation);
+		jndiCtx.bind("expedition", expedition);
 		jndiCtx.close();
 
 		AdminModule.disconnect();

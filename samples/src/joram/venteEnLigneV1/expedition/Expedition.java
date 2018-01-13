@@ -62,12 +62,12 @@ public class Expedition
 					System.out.println("Commande expédiée.");
 				}
 				else
-					commande_valide = connexion.setEtatCommande(id_commande, "initiee");
+					connexion.razCommande(id_commande);
 			}
 			else
 			{
 				System.out.println("Commande "+id_commande+" invalide : réinitialisation de son état.");
-				connexion.setEtatCommande(id_commande, "initiee");
+				connexion.razCommande(id_commande);
 			}
 			
 			//Prévoir cas d'arrêt

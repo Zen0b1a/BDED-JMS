@@ -20,7 +20,8 @@ DROP TABLE jms_client;
 CREATE TABLE jms_produit(
 	id INTEGER PRIMARY KEY, 
 	nom VARCHAR2(50), 
-	stock INTEGER);
+	stock INTEGER,
+	stock_pour_commandes INTEGER);
 	
 CREATE TABLE jms_client(
 	id INTEGER PRIMARY KEY, 
@@ -42,12 +43,12 @@ CREATE TABLE jms_commande_produit(
 	quantite INTEGER,
 	CONSTRAINT pk_commande_produit PRIMARY KEY(id_commande, id_produit));
 
-INSERT INTO jms_produit VALUES(1, 'produit1', 10);
-INSERT INTO jms_produit VALUES(2, 'produit2', 10);
+INSERT INTO jms_produit VALUES(1, 'produit1', 10, 0);
+INSERT INTO jms_produit VALUES(2, 'produit2', 10, 0);
 
 INSERT INTO jms_client VALUES(1, 'nom1', 'prenom1', 'adresse1', 21000, 'Dijon');
 
-INSERT INTO jms_commande VALUES(1, 1, 'initiee')
+INSERT INTO jms_commande VALUES(1, 1, 'initiee');
 
 INSERT INTO jms_commande_produit VALUES(1, 1, 1);
 INSERT INTO jms_commande_produit VALUES(1, 2, 1);

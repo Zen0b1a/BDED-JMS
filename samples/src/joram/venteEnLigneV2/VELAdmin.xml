@@ -15,14 +15,23 @@
 	</TcpConnectionFactory>
 
 	<TcpConnectionFactory name="cf2" host="localhost" port="16012">
+		<outInterceptors>
+			<interceptor className="venteEnLigneV2.Interceptor"/>
+		</outInterceptors>
 		<jndi name="cf2"/>
 	</TcpConnectionFactory>
 	
 	<TcpConnectionFactory name="cf3" host="localhost" port="16013">
+		<outInterceptors>
+			<interceptor className="venteEnLigneV2.Interceptor"/>
+		</outInterceptors>
 		<jndi name="cf3"/>
 	</TcpConnectionFactory>
 	
 	<TcpConnectionFactory name="cf4" host="localhost" port="16014">
+		<outInterceptors>
+			<interceptor className="venteEnLigneV2.Interceptor"/>
+		</outInterceptors>
 		<jndi name="cf4"/>
 	</TcpConnectionFactory>
 
@@ -83,6 +92,11 @@
 		<property name="consumThreshold" value="2" />
 		<property name="autoEvalThreshold" value="false" />
 		<property name="waitAfterClusterReq" value="100" />
+	</Queue>
+	
+	<Queue name="expedition" serverId="4">
+		<writer user="user_expedition" />
+		<jndi name="expedition"/>
 	</Queue>
 	
 	<ClusterCF>

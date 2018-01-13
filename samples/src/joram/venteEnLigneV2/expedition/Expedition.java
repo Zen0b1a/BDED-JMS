@@ -17,7 +17,6 @@ public class Expedition
 	public Expedition() throws Exception
 	{
 		ictx = new InitialContext();
-		Connexion connexion = new Connexion();
 		int id_commande = -1;
 		boolean commande_valide = true;
 		boolean continuer = true;
@@ -46,20 +45,11 @@ public class Expedition
 				System.out.println("Commande "+id_commande+" reçue, appuyer sur une touche pour l'expédier.");
 				System.in.read();
 
-				//Changement de l'état de la commande
-				if(commande_valide)
-				{
-					commande_valide = connexion.setEtatCommande(id_commande, "expediee");
-					System.out.println("Commande expédiée.");
-				}
-				else
-					commande_valide = connexion.setEtatCommande(id_commande, "initiee");
+				this.envoiMessage(session, id_commande, commande_valide);
+				System.out.println("Commande expédiée.");
 			}
 			else
-			{
-				System.out.println("Commande "+id_commande+" invalide : réinitialisation de son état.");
-				connexion.setEtatCommande(id_commande, "initiee");
-			}
+				System.out.println("Commande "+id_commande+" invalide.");
 			
 			//Prévoir cas d'arrêt
 			continuer = false;
@@ -68,6 +58,29 @@ public class Expedition
 		//Fermeture
 		ictx.close();
 		cnx.close();
-		connexion.closeConnexion();
+	}
+	
+	private boolean envoiMessage(Session session, int id_commande, boolean commande_valide)
+	{
+		try
+		{
+			System.out.println("Envoi d'un message pour la commande "+id_commande+" expédiée : "+commande_valide);
+			
+			Queue queue = (Queue) ictx.lookup("expedition");
+			MessageProducer sender = session.createProducer(queue);
+			
+			MapMessage msg = session.createMapMessage();
+			msg.setString("service", "expedition");
+			msg.setInt("id", id_commande);
+			msg.setBoolean("valide", commande_valide);
+			
+			sender.send(msg);
+			
+			return true;
+		}
+		catch(Exception ex)
+		{
+			return false;
+		}
 	}
 }

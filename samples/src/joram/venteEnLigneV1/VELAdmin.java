@@ -20,9 +20,6 @@ import org.objectweb.joram.client.jms.admin.AdminModule;
 import org.objectweb.joram.client.jms.admin.User;
 import org.objectweb.joram.client.jms.tcp.TcpConnectionFactory;
 
-/**
- * Administers an agent server for the classic samples.
- */
 public class VELAdmin 
 {
 	public static void main(String[] args) throws Exception 

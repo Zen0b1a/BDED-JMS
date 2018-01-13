@@ -132,11 +132,11 @@ public class ConnexionImpl extends UnicastRemoteObject implements Connexion
 	
 	//Mise à jour du stock
 	@Override
-	public boolean majStock(int id_commande) throws RemoteException
+	public boolean majStockValidation(int id_commande) throws RemoteException
 	{
 		try
 		{
-			PreparedStatement stmt = this.connexion.prepareStatement("SELECT cp.quantite, p.stock, p.id FROM "+
+			PreparedStatement stmt = this.connexion.prepareStatement("SELECT cp.quantite, p.stock, p.stock_pour_commandes, p.id FROM "+
 				"jms_commande_produit cp "+
 				"INNER JOIN jms_commande c ON c.id=cp.id_commande "+
 				"INNER JOIN jms_produit p ON p.id=cp.id_produit "+
@@ -147,14 +147,111 @@ public class ConnexionImpl extends UnicastRemoteObject implements Connexion
 			{
 				int quantite_commande = rs.getInt(1);
 				int stock_produit = rs.getInt(2);
-				int id_produit = rs.getInt(3);
+				int stock_produit_pour_commandes = rs.getInt(3);
+				int id_produit = rs.getInt(4);
 				int nouveau_stock = stock_produit - quantite_commande;
-				PreparedStatement stmt2 = this.connexion.prepareStatement("UPDATE jms_produit SET stock=? WHERE id=?");
-				stmt2.setInt(1, nouveau_stock);
+				int nouveau_stock_pour_commandes = stock_produit_pour_commandes + quantite_commande;
+				PreparedStatement stmt2 = this.connexion.prepareStatement("UPDATE jms_produit SET stock_pour_commandes=?, stock=? WHERE id=?");
+				stmt2.setInt(1, nouveau_stock_pour_commandes);
+				stmt2.setInt(2, nouveau_stock);
+				stmt2.setInt(3, id_produit);
+				stmt2.executeUpdate();
+				stmt2.close();
+			}
+			rs.close();
+			stmt.close();
+			return true;
+		}
+		catch(SQLException ex)
+		{
+			return false;
+		}
+	}
+	
+	@Override
+	public boolean majStockPreparation(int id_commande) throws RemoteException
+	{
+		try
+		{
+			PreparedStatement stmt = this.connexion.prepareStatement("SELECT cp.quantite, p.stock_pour_commandes, p.id FROM "+
+				"jms_commande_produit cp "+
+				"INNER JOIN jms_commande c ON c.id=cp.id_commande "+
+				"INNER JOIN jms_produit p ON p.id=cp.id_produit "+
+				"WHERE c.id=?");
+			stmt.setInt(1, id_commande);
+			ResultSet rs = stmt.executeQuery();
+			while(rs.next())
+			{
+				int quantite_commande = rs.getInt(1);
+				int stock_produit_pour_commandes = rs.getInt(2);
+				int id_produit = rs.getInt(3);
+				int nouveau_stock_pour_commandes = stock_produit_pour_commandes - quantite_commande;
+				PreparedStatement stmt2 = this.connexion.prepareStatement("UPDATE jms_produit SET stock_pour_commandes=? WHERE id=?");
+				stmt2.setInt(1, nouveau_stock_pour_commandes);
 				stmt2.setInt(2, id_produit);
 				stmt2.executeUpdate();
 				stmt2.close();
 			}
+			rs.close();
+			stmt.close();
+			return true;
+		}
+		catch(SQLException ex)
+		{
+			return false;
+		}
+	}
+	
+	@Override
+	public boolean razCommande(int id_commande) throws RemoteException
+	{
+		try
+		{
+			PreparedStatement stmt = this.connexion.prepareStatement("SELECT cp.quantite, p.stock_pour_commandes, p.id, c.etat FROM "+
+				"jms_commande_produit cp "+
+				"INNER JOIN jms_commande c ON c.id=cp.id_commande "+
+				"INNER JOIN jms_produit p ON p.id=cp.id_produit "+
+				"WHERE c.id=?");
+			stmt.setInt(1, id_commande);
+			ResultSet rs = stmt.executeQuery();
+			while(rs.next())
+			{
+				int quantite_commande = rs.getInt(1);
+				int stock_produit = rs.getInt(2);
+				int stock_produit_pour_commandes = rs.getInt(3);
+				int id_produit = rs.getInt(4);
+				String etat = rs.getString(5);
+				
+				PreparedStatement stmt2 = this.connexion.prepareStatement("UPDATE jms_produit SET stock_pour_commandes=?, stock=? WHERE id=?");
+				if(!"initiee".equals(etat))
+				{
+					if("validee".equals(etat))
+					{
+						//Le stock du produit qui concerne des commandes validées mais non préparées n'est est diminué de la quantité de ce produit dans la commande
+						//Le stock du produit est augmenté de la quantité de ce produit dans la commande
+						stmt2.setInt(1, stock_produit_pour_commandes-quantite_commande);
+						stmt2.setInt(2, stock_produit+quantite_commande);
+						stmt2.setInt(3, id_produit);
+						stmt2.executeUpdate();
+					}
+					else if("preparee".equals(etat) || "payee".equals(etat) || "expediee".equals(etat))
+					{
+						//Le stock du produit qui concerne des commandes validées mais non préparées n'est pas modifié
+						//Le stock du produit est augmenté de la quantité de ce produit dans la commande
+						stmt2.setInt(1, stock_produit_pour_commandes);
+						stmt2.setInt(2, stock_produit+quantite_commande);
+						stmt2.setInt(3, id_produit);
+						stmt2.executeUpdate();
+					}
+				}
+				int nouveau_stock_pour_commandes = stock_produit_pour_commandes - quantite_commande;
+				stmt2.close();
+			}
+			//Remise de l'état à "initiee"
+			stmt = this.connexion.prepareStatement("UPDATE jms_commande SET etat='initiee' WHERE id=?");
+			stmt.setInt(1, id_commande);
+			stmt.executeUpdate();
+			
 			rs.close();
 			stmt.close();
 			return true;
