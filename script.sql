@@ -49,6 +49,10 @@ INSERT INTO jms_produit VALUES(2, 'produit2', 10, 0);
 INSERT INTO jms_client VALUES(1, 'nom1', 'prenom1', 'adresse1', 21000, 'Dijon');
 
 INSERT INTO jms_commande VALUES(1, 1, 'initiee');
+INSERT INTO jms_commande VALUES(2, 1, 'initiee');
+INSERT INTO jms_commande VALUES(3, 1, 'initiee');
 
 INSERT INTO jms_commande_produit VALUES(1, 1, 1);
 INSERT INTO jms_commande_produit VALUES(1, 2, 1);
+INSERT INTO jms_commande_produit VALUES(2, 1, 2);
+INSERT INTO jms_commande_produit VALUES(3, 2, 2);

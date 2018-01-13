@@ -14,5 +14,6 @@ public interface Connexion extends Remote
 	public boolean majStockValidation(int id_commande) throws RemoteException;
 	public boolean majStockPreparation(int id_commande) throws RemoteException;
 	public boolean razCommande(int id_commande) throws RemoteException;
+	public boolean razBD() throws RemoteException;
 	public int getId() throws RemoteException;
 }

@@ -263,6 +263,23 @@ public class Connexion
 		}
 	}
 	
+	public boolean razBD()
+	{
+		try
+		{
+			PreparedStatement stmt = this.connexion.prepareStatement("UPDATE jms_commande SET etat='initiee'");
+			stmt.executeUpdate();
+			stmt = this.connexion.prepareStatement("UPDATE jms_produit SET stock=10, stock_pour_commandes=0");
+			stmt.executeUpdate();
+			stmt.close();
+			return true;
+		}
+		catch(SQLException ex)
+		{
+			return false;
+		}
+	}
+	
 	public void closeConnexion()
 	{
 		try

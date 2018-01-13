@@ -71,10 +71,24 @@ public class Validation
 				System.out.println("Commande "+id_commande+" validée.");
 			}
 			else
-				System.out.println("Validation de la commande "+id_commande+" impossible : vérifier le stock.");
+			{
+				System.out.println("Validation de la commande "+id_commande+" impossible : vérifier le stock. Faire une remise à zéro de la base de données ? O/N");
+				if("O".equalsIgnoreCase(sc.nextLine()))
+				{
+					connexion.razBD();
+					System.out.println("Base de données réinitialisée (stock produits à 10 et état commandes à initiée).");
+				}
+			}
 		}
 		else
-			System.out.println("Il n'y a pas de commande en attente de validation");
+		{
+			System.out.println("Il n'y a pas de commande en attente de validation, faire une remise à zéro de la base de données ? O/N");
+			if("O".equalsIgnoreCase(sc.nextLine()))
+			{
+				connexion.razBD();
+				System.out.println("Base de données réinitialisée (stock produits à 10 et état commandes à initiée).");
+			}
+		}
 		
 		//Fermeture de la connexion
 		cfBD.libereConnexion(connexion);

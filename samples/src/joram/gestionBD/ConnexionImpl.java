@@ -261,4 +261,22 @@ public class ConnexionImpl extends UnicastRemoteObject implements Connexion
 			return false;
 		}
 	}
+	
+	@Override
+	public boolean razBD() throws RemoteException
+	{
+		try
+		{
+			PreparedStatement stmt = this.connexion.prepareStatement("UPDATE jms_commande SET etat='initiee'");
+			stmt.executeUpdate();
+			stmt = this.connexion.prepareStatement("UPDATE jms_produit SET stock=10, stock_pour_commandes=0");
+			stmt.executeUpdate();
+			stmt.close();
+			return true;
+		}
+		catch(SQLException ex)
+		{
+			return false;
+		}
+	}
 }
