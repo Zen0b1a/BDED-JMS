@@ -27,6 +27,7 @@ public class Validation
 		//Récupération de la ConnexionFactory depuis le rmiregistry
 		ictx = new InitialContext(env);
 		ConnexionFactory cfBD = (ConnexionFactory)ictx.lookup("cfBD");
+		
 		//Retour sur l'annuaire jndi
 		ictx = new InitialContext();
 		Connexion connexion = cfBD.getConnexion();

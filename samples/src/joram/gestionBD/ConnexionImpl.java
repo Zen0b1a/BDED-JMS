@@ -207,7 +207,7 @@ public class ConnexionImpl extends UnicastRemoteObject implements Connexion
 	{
 		try
 		{
-			PreparedStatement stmt = this.connexion.prepareStatement("SELECT cp.quantite, p.stock_pour_commandes, p.id, c.etat FROM "+
+			PreparedStatement stmt = this.connexion.prepareStatement("SELECT cp.quantite, p.stock, p.stock_pour_commandes, p.id, c.etat FROM "+
 				"jms_commande_produit cp "+
 				"INNER JOIN jms_commande c ON c.id=cp.id_commande "+
 				"INNER JOIN jms_produit p ON p.id=cp.id_produit "+

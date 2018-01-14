@@ -16,7 +16,7 @@ public class Interceptor implements MessageInterceptor
 	{
 		try
 		{
-			if(message instanceof MapMessage && ((MapMessage)message).itemExists("service"))
+			if(message instanceof MapMessage && ((MapMessage)message).itemExists("service") && ((MapMessage)message).itemExists("id") && ((MapMessage)message).itemExists("valide"))
 			{
 				Connexion connexion = new Connexion();
 				MapMessage msg = (MapMessage)message;
@@ -31,26 +31,35 @@ public class Interceptor implements MessageInterceptor
 						commande_valide = connexion.majStockPreparation(id_commande) && connexion.setEtatCommande(id_commande, "preparee");
 						
 					if(!commande_valide)
+					{
+						msg.setBoolean("valide", false);
 						connexion.razCommande(id_commande);
+					}
 				}
 				else if("facturation".equals(service))
 				{
 					if(commande_valide)
 						connexion.setEtatCommande(id_commande, "payee");
 					else
+					{
+						msg.setBoolean("valide", false);
 						connexion.razCommande(id_commande);
+					}
 				}
 				else if("expedition".equals(service))
 				{
 					if(commande_valide)
 						connexion.setEtatCommande(id_commande, "expediee");
 					else
+					{
+						msg.setBoolean("valide", false);
 						connexion.razCommande(id_commande);
+					}
 				}
 				connexion.closeConnexion();
 			}
 		}
-		catch(JMSException ex)
+		catch(Exception ex)
 		{
 			System.out.println(ex);
 		}
