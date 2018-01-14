@@ -128,17 +128,30 @@ public class DiffuseActions
 		
 		//Récupération des différentes actions
 		String nom_tables = "";
+		Hashtable<Integer, String> actions = new Hashtable();
+		Hashtable<String, String> actions_pour_clients = new Hashtable();
 		Statement stmt = connexion.createStatement();
-		ResultSet rs = stmt.executeQuery("select nom_action from action order by id");
+		ResultSet rs = stmt.executeQuery("select id, id_parent, nom_action from action order by id_parent");
 		while(rs.next())
 		{
 			//Récupération du nom de l'action
-			String nom_action = rs.getString(1).toLowerCase();
+			int id = rs.getInt(1);
+			int id_parent = rs.getInt(2);
+			String nom_action = rs.getString(3).toLowerCase();
 			nom_tables += nom_action+",";
+			actions.put(id, nom_action);
 			//Création du topic
 			Topic topic = Topic.create(nom_action);
 			topic.setFreeReading();
 			topic.setFreeWriting();
+			if(id_parent != 0)
+			{
+				String nom_parent = actions.get(id_parent);
+				topic.setParent(topics.get(nom_parent));
+				actions_pour_clients.put(nom_action, nom_parent);
+			}
+			else
+				actions_pour_clients.put(nom_action, "");
 			topics.put(nom_action, topic);
 			System.out.println("Topic : "+nom_action);
 		}
@@ -169,9 +182,9 @@ public class DiffuseActions
 		jndiCtx.bind("cf", cf);
 		jndiCtx.bind("tcf", tcf);
 		//Enregistrement de la liste des actions disponibles
-		Set<String> keys = topics.keySet();
-		jndiCtx.bind("liste_actions", keys.toArray(new String[keys.size()]));
+		jndiCtx.bind("liste_actions", actions_pour_clients);
 		//Enregistrement des topics
+		Set<String> keys = topics.keySet();
         for(String key : keys)
 			jndiCtx.bind(key, topics.get(key));
 

@@ -4,8 +4,8 @@ DROP TABLE action_2;
 DROP TABLE action_3;
 
 CREATE TABLE action (id INTEGER PRIMARY KEY, id_parent INTEGER, nom_action VARCHAR2(50));
-INSERT INTO action VALUES(1, NULL, 'action_1');
-INSERT INTO action VALUES(2, NULL, 'action_2');
+INSERT INTO action VALUES(1, 0, 'action_1');
+INSERT INTO action VALUES(2, 0, 'action_2');
 INSERT INTO action VALUES(3, 1, 'action_3');
 
 CREATE TABLE action_1 (id INTEGER PRIMARY KEY, cours NUMBER(6,2));

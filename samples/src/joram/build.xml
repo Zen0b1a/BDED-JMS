@@ -350,6 +350,16 @@
     </java>
   </target>
   
+  <!-- Modification de la BD -->
+  <target name="modif_actions" depends="simple_init"
+          description="--> ">
+    <java classname="action.ModifActions"
+      failonerror="no" fork="yes"
+      dir="${run.dir}">
+      <classpath path="${project.class.path}"/>
+    </java>
+  </target>
+  
   <!-- **************************************************
        * Vente en ligne - version 1
        ************************************************** -->
