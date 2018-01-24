@@ -53,62 +53,64 @@ public class DiffuseActions
 		System.out.println();
 		System.out.println("Préparation des topics d'actions");
 		
+		//Ouverture de la connexion
+		OracleConnection connexion = Connexion.connect();
+		
 		//Définition de l'adresse ip à utiliser (pour le listener)
-		//Récupération des adresses
 		String ip = InetAddress.getLocalHost().getHostAddress();
-		String[] ip_split = ip.split("\\.");
-		//VPN : 172.31.19.0/24, FAC :
-		if(ip_split[0].equals("172") && ip_split[1].equals("31") && ip_split[2].equals("19"))
+		if(Connexion.isCoFac())
 		{
-			//On est connecté au VPN -> récupération de l'adresse de la machine
-			Enumeration nifs = NetworkInterface.getNetworkInterfaces();
-			List<String> ip_disponibles = new ArrayList();
-			while (nifs.hasMoreElements()) 
+			//Récupération des adresses
+			String[] ip_split = ip.split("\\.");
+			//VPN : 172.31.19.0/24
+			if(ip_split[0].equals("172") && ip_split[1].equals("31") && ip_split[2].equals("19"))
 			{
-				NetworkInterface ni = (NetworkInterface)nifs.nextElement();
-				if(ni.isUp() && !ni.isLoopback())
+				//On est connecté au VPN -> récupération de l'adresse de la machine
+				Enumeration nifs = NetworkInterface.getNetworkInterfaces();
+				List<String> ip_disponibles = new ArrayList();
+				while (nifs.hasMoreElements()) 
 				{
-					Enumeration adresses = ni.getInetAddresses();
-					while(adresses.hasMoreElements())
+					NetworkInterface ni = (NetworkInterface)nifs.nextElement();
+					if(ni.isUp() && !ni.isLoopback())
 					{
-						InetAddress adresse = (InetAddress)adresses.nextElement();
-						if(adresse instanceof Inet4Address && !adresse.getHostAddress().equals(ip))
-							ip_disponibles.add(adresse.getHostAddress());
+						Enumeration adresses = ni.getInetAddresses();
+						while(adresses.hasMoreElements())
+						{
+							InetAddress adresse = (InetAddress)adresses.nextElement();
+							if(adresse instanceof Inet4Address && !adresse.getHostAddress().equals(ip))
+								ip_disponibles.add(adresse.getHostAddress());
+						}
 					}
 				}
-			}
-			if(ip_disponibles.size()>1)
-			{
-				//Si plusieurs ip sont disponibles en dehors de celle du VPN
-				String choix_ip = "";
-				Scanner sc = new Scanner(System.in);
-				for(int i=0; i<ip_disponibles.size(); i++)
-					System.out.println(i+" - "+ip_disponibles.get(i));
-				//Tant que l'option est invalide on redemande
-				while(choix_ip.equals(""))
+				if(ip_disponibles.size()>1)
 				{
-					System.out.println("Choisir le numéro de l'adresse ip de la machine :");
-					choix_ip = sc.nextLine();
-					try
+					//Si plusieurs ip sont disponibles en dehors de celle du VPN
+					String choix_ip = "";
+					Scanner sc = new Scanner(System.in);
+					for(int i=0; i<ip_disponibles.size(); i++)
+						System.out.println(i+" - "+ip_disponibles.get(i));
+					//Tant que l'option est invalide on redemande
+					while(choix_ip.equals(""))
 					{
-						if(Integer.parseInt(choix_ip)<0 || Integer.parseInt(choix_ip)>=ip_disponibles.size())
+						System.out.println("Choisir le numéro de l'adresse ip de la machine :");
+						choix_ip = sc.nextLine();
+						try
+						{
+							if(Integer.parseInt(choix_ip)<0 || Integer.parseInt(choix_ip)>=ip_disponibles.size())
+								choix_ip = "";
+							else
+								choix_ip = ip_disponibles.get(Integer.parseInt(choix_ip));
+						}
+						catch(NumberFormatException ex)
+						{
 							choix_ip = "";
-						else
-							choix_ip = ip_disponibles.get(Integer.parseInt(choix_ip));
+						}
 					}
-					catch(NumberFormatException ex)
-					{
-						choix_ip = "";
-					}
+					ip = choix_ip;
 				}
-				ip = choix_ip;
+				else
+					ip = ip_disponibles.get(0);
 			}
-			else
-				ip = ip_disponibles.get(0);
-		}
-		else if(ip_split[0].equals("172") && ip_split[1].equals("31") && ip_split[2].equals("18"))
-		{
-			//On est connecté à la fac
 		}
 		else
 		{
@@ -122,9 +124,6 @@ public class DiffuseActions
 
 		ConnectionFactory cf = TcpConnectionFactory.create(InetAddress.getLocalHost().getHostAddress(), 16010);
 		AdminModule.connect(cf, "root", "root");
-		
-		//Ouverture de la connexion
-		OracleConnection connexion = Connexion.connect();
 		
 		//Récupération des différentes actions
 		String nom_tables = "";
